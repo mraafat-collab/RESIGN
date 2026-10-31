@@ -413,17 +413,17 @@ with tab_main:
         """
         components.html(html_content, height=940, scrolling=True)
 
-        # EMAIL SECTION (UPDATED UI)
-        with st.expander("✉️ إرسال التقرير عبر البريد الإلكتروني المباشر (Direct Corporate Send)"):
+        # EMAIL SECTION
+        with st.expander("✉️ إرسال التقرير عبر البريد الإلكتروني المباشر (Direct Corporate Send)", expanded=True):
             c_e1, c_e2 = st.columns(2)
             with c_e1:
-                receiver = st.text_input("بريد المستلم الرئيسي (To Email)", value="", placeholder="e.g. recipient@gmail.com", key="to_email_input")
-                cc_receiver = st.text_input("نسخة كربونية (CC Email - اختياري)", value="", placeholder="e.g. manager@company.com", key="cc_email_input")
+                receiver = st.text_input("بريد المستلم الرئيسي (To Email)", value="", placeholder="e.g. recipient@gmail.com", key="to_email_v2")
+                cc_receiver = st.text_input("نسخة كربونية (CC Email - اختياري)", value="", placeholder="e.g. manager@company.com", key="cc_email_v2")
             with c_e2:
-                smtp_host = st.text_input("سيرفر SMTP", value="smtp.office365.com", key="smtp_input")
+                smtp_host = st.text_input("سيرفر SMTP", value="smtp.office365.com", key="smtp_v2")
                 st.info(f"📧 سيتم الإرسال تلقائياً من البريد المعتمد:\n`{DEFAULT_SENDER_EMAIL}`")
 
-            if st.button("🚀 إرسال التقرير الآن", key="send_btn_new"):
+            if st.button("🚀 إرسال التقرير الآن", key="send_btn_v2"):
                 if receiver and smtp_host:
                     try:
                         msg = MIMEMultipart('alternative')

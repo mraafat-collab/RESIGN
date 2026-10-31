@@ -10,7 +10,7 @@ from email.mime.text import MIMEText
 from docx import Document
 
 # ---------------------------------------------------------
-# FIXED SENDER CREDENTIALS (تثبيت بيانات المرسل تلقائياً)
+# FIXED SENDER CREDENTIALS
 # ---------------------------------------------------------
 DEFAULT_SENDER_EMAIL = "m.raafat@mojoefood.com"
 DEFAULT_SENDER_PASSWORD = "gnpa2b6kXBPKi53"
@@ -413,17 +413,17 @@ with tab_main:
         """
         components.html(html_content, height=940, scrolling=True)
 
-        # EMAIL TEMPLATE SECTION - WITH AUTOMATED CREDENTIALS & CC SUPPORT
-        with st.expander("📧 إرسال التقرير عبر البريد الإلكتروني (Send via Corporate Email)"):
+        # EMAIL SECTION (UPDATED UI)
+        with st.expander("✉️ إرسال التقرير عبر البريد الإلكتروني المباشر (Direct Corporate Send)"):
             c_e1, c_e2 = st.columns(2)
             with c_e1:
-                receiver = st.text_input("بريد المستلم الرئيسي (To Email)", value="", placeholder="e.g. recipient@gmail.com")
-                cc_receiver = st.text_input("نسخة كربونية (CC Email - اختياري)", value="", placeholder="e.g. manager@company.com")
+                receiver = st.text_input("بريد المستلم الرئيسي (To Email)", value="", placeholder="e.g. recipient@gmail.com", key="to_email_input")
+                cc_receiver = st.text_input("نسخة كربونية (CC Email - اختياري)", value="", placeholder="e.g. manager@company.com", key="cc_email_input")
             with c_e2:
-                smtp_host = st.text_input("سيرفر SMTP الخاص بالشركات", value="smtp.office365.com")
-                st.caption(f"ℹ️ البريد الإلكتروني للمرسل مثبت تلقائياً: `{DEFAULT_SENDER_EMAIL}`")
+                smtp_host = st.text_input("سيرفر SMTP", value="smtp.office365.com", key="smtp_input")
+                st.info(f"📧 سيتم الإرسال تلقائياً من البريد المعتمد:\n`{DEFAULT_SENDER_EMAIL}`")
 
-            if st.button("🚀 إرسال التقرير مباشرة بالإيميل"):
+            if st.button("🚀 إرسال التقرير الآن", key="send_btn_new"):
                 if receiver and smtp_host:
                     try:
                         msg = MIMEMultipart('alternative')
@@ -460,7 +460,6 @@ with tab_main:
                         
                         host_clean = smtp_host.strip()
                         
-                        # Auto-connect logic with fallback ports
                         try:
                             server = smtplib.SMTP(host_clean, 587, timeout=12)
                             server.ehlo()
@@ -473,7 +472,7 @@ with tab_main:
                         server.sendmail(DEFAULT_SENDER_EMAIL, recipients_list, msg.as_string())
                         server.quit()
                         
-                        st.success("✅ تم إرسال الإيميل بنجاح مع النسخة الكربونية (CC)!")
+                        st.success("✅ تم إرسال الإيميل بنجاح!")
                     except Exception as e:
                         st.error(f"❌ فشل إرسال الإيميل: {e}")
                 else:

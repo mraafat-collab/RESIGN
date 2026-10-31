@@ -19,59 +19,96 @@ DEFAULT_SENDER_PASSWORD = "gnpa2b6kXBPKi53"
 # Page Configuration
 # ---------------------------------------------------------
 st.set_page_config(
-    page_title="Resignation Approval System",
-    page_icon="📄",
-    layout="wide"
+    page_title="Corporate Resignation Portal",
+    page_icon="💼",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # ---------------------------------------------------------
-# Custom CSS for Top Navigation Tabs
+# Ultimate Futuristic UI/UX Styling (Glassmorphism & Gold/Dark Theme)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
     
     html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
-        background-color: #F8F6F0;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: #0F172A;
+        color: #F8FAFC;
     }
+    
     .stApp {
-        background-color: #F8F6F0;
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
     }
 
-    /* Glowing Rectangular Top Navigation Tabs */
+    /* Top Navigation Pills */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 12px;
-        background-color: transparent;
-        padding-bottom: 12px;
-        border-bottom: 2px solid #EADBCE;
+        gap: 8px;
+        background: rgba(30, 41, 59, 0.7);
+        padding: 8px;
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     .stTabs [data-baseweb="tab"] {
-        height: 46px;
-        background-color: #FFFFFF;
-        border-radius: 8px;
-        color: #8C5A2B;
+        height: 48px;
+        background-color: transparent;
+        border-radius: 12px;
+        color: #94A3B8;
         font-weight: 700;
-        font-size: 15px;
-        border: 1.5px solid #D6C2A7;
-        padding: 0px 22px;
-        box-shadow: 0px 2px 4px rgba(0,0,0,0.03);
-        transition: all 0.2s ease-in-out;
+        font-size: 14px;
+        border: none;
+        padding: 0px 24px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .stTabs [data-baseweb="tab"]:hover {
-        border-color: #8C5A2B;
-        color: #8C5A2B;
-        transform: translateY(-2px);
+        color: #F1F5F9;
+        background: rgba(255, 255, 255, 0.05);
     }
     
     .stTabs [aria-selected="true"] {
-        background-color: #8C5A2B !important;
+        background: linear-gradient(135deg, #D97706 0%, #B45309 100%) !important;
         color: #FFFFFF !important;
-        border-color: #8C5A2B !important;
-        box-shadow: 0px 4px 12px rgba(140, 90, 43, 0.4) !important;
+        box-shadow: 0px 4px 20px rgba(217, 119, 6, 0.4) !important;
+    }
+
+    /* Glass Cards Wrapper */
+    .glass-card {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        margin-bottom: 20px;
+    }
+    
+    /* Custom Metric Styling */
+    [data-testid="stMetricValue"] {
+        font-size: 28px !important;
+        font-weight: 800 !important;
+        color: #F59E0B !important;
+    }
+
+    /* Primary Buttons Styling */
+    .stButton>button {
+        background: linear-gradient(135deg, #D97706 0%, #B45309 100%);
+        color: white;
+        font-weight: 700;
+        border-radius: 12px;
+        border: none;
+        padding: 12px 28px;
+        box-shadow: 0 4px 14px 0 rgba(217, 119, 6, 0.39);
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    .stButton>button:hover {
         transform: translateY(-2px);
+        box-shadow: 0 6px 20px 0 rgba(217, 119, 6, 0.55);
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -89,7 +126,6 @@ def to_english_str(text):
 def generate_word_doc(data, exp_days):
     doc = Document()
     doc.add_heading(f"RESIGNATION APPROVAL REQUEST - {data['employee_name']}", 0)
-    
     doc.add_paragraph(f"Recipient: Dear {data.get('recipient_name', 'Manager')}")
     doc.add_paragraph(f"Employee Name: {data['employee_name']}")
     doc.add_paragraph(f"Job Title: {data['job_title']}")
@@ -101,8 +137,6 @@ def generate_word_doc(data, exp_days):
     doc.add_paragraph(f"Total Net Pay: {data['net_pay']} EGP")
     doc.add_paragraph(f"Reason for Leaving: {data['reason']}")
     doc.add_paragraph(f"Direct Manager: {data['direct_manager']}")
-    doc.add_paragraph(f"Notice Period Status: {data['notice_period']}")
-    doc.add_paragraph(f"Handover Status: {data['handover_status']}")
     
     bio = io.BytesIO()
     doc.save(bio)
@@ -119,14 +153,9 @@ def generate_excel(data, exp_days):
         "Resignation Date": data['resignation_date'].strftime('%Y-%m-%d'),
         "Last Working Day": data['last_working_day'].strftime('%Y-%m-%d'),
         "Total Experience (Days)": exp_days,
-        "Grading System": data['grading'],
         "Total Net Pay (EGP)": data['net_pay'],
         "Reason": data['reason'],
-        "Notice Period Status": data['notice_period'],
-        "Handover Status": data['handover_status'],
-        "Direct Manager": data['direct_manager'],
-        "Absence Days": data['absence_days'],
-        "Loan Balance EGP": data['loan_balance']
+        "Direct Manager": data['direct_manager']
     }])
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
@@ -158,508 +187,275 @@ if 'resignations_db' not in st.session_state:
     ]
 
 # ---------------------------------------------------------
-# Top Navigation Bar
+# Sidebar - Quick Selector & Master Control
 # ---------------------------------------------------------
-tab_main, tab_manage, tab_dashboard = st.tabs([
-    "🏠 عرض وطباعة الاستقالة (A4)", 
-    "📝 إضافة / تعديل / حذف استقالة", 
-    "📊 داشبورد الفروع"
+with st.sidebar:
+    st.image("https://img.icons8.com/3d-fluency/94/corporate-user.png", width=70)
+    st.title("بوابة الاستقالات")
+    st.caption("نظام الإدارة المركزي الموحد 2026")
+    st.markdown("---")
+    
+    if st.session_state.resignations_db:
+        emp_options = {r['id']: f"{r['employee_name']} ({r['branch']})" for r in st.session_state.resignations_db}
+        selected_id = st.selectbox("🎯 اختر الموظف الحالي:", options=list(emp_options.keys()), format_func=lambda x: emp_options[x])
+        data = next(item for item in st.session_state.resignations_db if item["id"] == selected_id)
+    else:
+        data = None
+
+    st.markdown("---")
+    st.success(f"⚡ إيميل النظام المعتمد:\n`{DEFAULT_SENDER_EMAIL}`")
+
+# ---------------------------------------------------------
+# Top Navigation Tabs
+# ---------------------------------------------------------
+tab_hub, tab_manage, tab_analytics = st.tabs([
+    "🚀 مركز التحكم والتقرير A4", 
+    "⚙️ إدارة وتعديل البيانات", 
+    "📊 التحليلات والداشبورد"
 ])
 
 # ---------------------------------------------------------
-# TAB 1: DISPLAY & EXPORT A4 TEMPLATE
+# TAB 1: ALL-IN-ONE CONTROL HUB
 # ---------------------------------------------------------
-with tab_main:
-    if not st.session_state.resignations_db:
+with tab_hub:
+    if not data:
         st.warning("⚠️ لا توجد بيانات استقالات مسجلة حالياً.")
     else:
-        emp_options = {r['id']: f"{r['employee_name']} — ({r['branch']})" for r in st.session_state.resignations_db}
-        selected_id = st.selectbox("اختر الموظف لعرض طلب الاستقالة الخاصة به:", options=list(emp_options.keys()), format_func=lambda x: emp_options[x])
-
-        data = next(item for item in st.session_state.resignations_db if item["id"] == selected_id)
-
-        exp_days = (data['last_working_day'] - data['hiring_date']).days
-        if exp_days < 0:
-            exp_days = 0
-
+        exp_days = max((data['last_working_day'] - data['hiring_date']).days, 0)
         h_date = data['hiring_date'].strftime("%d/%m/%Y")
         r_date = data['resignation_date'].strftime("%d/%m/%Y")
         l_date = data['last_working_day'].strftime("%d/%m/%Y")
-        r_date_header = data['resignation_date'].strftime("%d %b %Y")
         
-        recipient = data.get('recipient_name', '').strip()
-        if not recipient:
-            recipient = "Mohamed"
-        if not recipient.lower().startswith("mr.") and not recipient.lower().startswith("ms."):
-            recipient_title = f"Mr. {recipient}"
-        else:
-            recipient_title = recipient
+        recipient = data.get('recipient_name', 'Manager').strip()
+        recipient_title = recipient if recipient.lower().startswith(("mr.", "ms.")) else f"Mr. {recipient}"
 
-        # Export Toolbar
-        st.markdown("#### 📥 خيارات الحفظ والتصدير [Export & Save Options]:")
-        col_btn1, col_btn2 = st.columns(2)
+        # Top Control Row (Smart Actions)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+        col_act1, col_act2, col_act3, col_act4 = st.columns([2, 2, 3, 1])
         
-        with col_btn1:
-            word_bytes = generate_word_doc(data, exp_days)
-            st.download_button(
-                label="📄 حفظ كملف Word (.docx)",
-                data=word_bytes,
-                file_name=f"Resignation_{data['employee_name']}.docx",
-                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                use_container_width=True
-            )
+        with col_act1:
+            st.download_button("📄 تصدير Word (.docx)", generate_word_doc(data, exp_days), f"Resignation_{data['employee_name']}.docx", use_container_width=True)
+        with col_act2:
+            st.download_button("📊 تصدير Excel (.xlsx)", generate_excel(data, exp_days), f"Resignation_{data['employee_name']}.xlsx", use_container_width=True)
+        with col_act3:
+            st.info(f"👤 الموظف المعروض: **{data['employee_name']}**")
+        with col_act4:
+            st.metric("الخبرة", f"{exp_days} يوم")
             
-        with col_btn2:
-            excel_bytes = generate_excel(data, exp_days)
-            st.download_button(
-                label="📊 حفظ كملف Excel (.xlsx)",
-                data=excel_bytes,
-                file_name=f"Resignation_{data['employee_name']}.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                use_container_width=True
-            )
+        st.markdown('</div>', unsafe_allow_html=True)
 
-        st.markdown("---")
+        # Split View: Left Email Panel, Right Integrated Preview
+        c_left, c_right = st.columns([1, 2])
 
-        if data.get('photo_b64'):
-            img_html = f'<img src="data:image/png;base64,{data["photo_b64"]}" style="width:105px; height:140px; border-radius:8px; object-fit:cover; border:1px solid #D6C2A7;" />'
-        else:
-            img_html = '<div style="width:105px; height:140px; background:#EADBCE; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:42px; border:1px solid #D6C2A7;">👤</div>'
+        with c_left:
+            st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+            st.subheader("✉️ إرسال بريد الكتروني مباشر")
+            st.caption("يتم الإرسال تلقائياً عبر سيرفر الشركة")
+            
+            to_email = st.text_input("إلى (Main Receiver):", placeholder="recipient@company.com", key="hub_to")
+            cc_email = st.text_input("نسخة كربونية (CC):", placeholder="manager@company.com", key="hub_cc")
+            smtp_server = st.text_input("سيرفر SMTP:", value="smtp.office365.com", key="hub_smtp")
 
-        # Render HTML Card Component & Scripts
-        html_content = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-            <style>
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-                body {{
-                    font-family: 'Inter', sans-serif;
-                    background-color: #F8F6F0;
-                    margin: 0;
-                    padding: 10px;
-                }}
-                .btn-group {{
-                    display: flex;
-                    gap: 10px;
-                    justify-content: flex-end;
-                    margin-bottom: 15px;
-                }}
-                .action-btn {{
-                    background-color: #8C5A2B;
-                    color: white;
-                    border: none;
-                    padding: 11px 20px;
-                    border-radius: 8px;
-                    font-weight: bold;
-                    font-size: 13px;
-                    cursor: pointer;
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 6px;
-                    box-shadow: 0px 3px 8px rgba(140, 90, 43, 0.3);
-                }}
-                .action-btn:hover {{ background-color: #704721; }}
-                .a4-card {{
-                    background-color: #FAF8F5;
-                    border: 1.5px solid #D6C2A7;
-                    border-radius: 12px;
-                    padding: 22px;
-                    max-width: 800px;
-                    margin: 0 auto;
-                    box-shadow: 0px 4px 15px rgba(0,0,0,0.05);
-                }}
-                .custom-table {{
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 10px;
-                    border: 1px solid #D6C2A7;
-                }}
-                .custom-table th {{
-                    background-color: #8C5A2B;
-                    color: white;
-                    padding: 6px 10px;
-                    text-align: left;
-                    font-size: 12px;
-                    font-weight: 700;
-                }}
-                .custom-table td {{
-                    padding: 5px 10px;
-                    border-bottom: 1px solid #EADBCE;
-                    font-size: 12px;
-                    color: #222;
-                }}
-                .custom-table tr:nth-child(even) {{ background-color: #FAF8F5; }}
-                .metric-badge {{
-                    background-color: #8C5A2B;
-                    color: white;
-                    border-radius: 14px;
-                    padding: 5px 8px;
-                    text-align: center;
-                    font-weight: 700;
-                    font-size: 11px;
-                    margin-bottom: 4px;
-                }}
-                .metric-box {{
-                    background-color: #FAF8F5;
-                    border: 1px solid #D6C2A7;
-                    border-radius: 6px;
-                    padding: 6px;
-                    text-align: center;
-                    font-weight: 800;
-                    font-size: 13px;
-                    color: #111;
-                }}
-                @media print {{
-                    .no-print {{ display: none !important; }}
-                    body {{ background: white; padding: 0; }}
-                    .a4-card {{ border: none; box-shadow: none; width: 100%; max-width: 100%; padding: 0; }}
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="btn-group no-print">
-                <button onclick="downloadAsImage()" class="action-btn">🖼️ تنزيل كصورة (PNG)</button>
-                <button onclick="window.print()" class="action-btn">🖨️ طباعة / حفظ كـ PDF</button>
-            </div>
-
-            <div id="capture-card" class="a4-card">
-                <table style="width:100%; border:none; margin-bottom:12px;">
-                    <tr>
-                        <td style="width:55%; vertical-align:top; border:none;">
-                            <div style="color:#8C5A2B; font-size:16px; font-weight:700; margin-bottom:4px;">Dear {recipient_title},</div>
-                            <div style="color:#8C5A2B; font-weight:800; font-size:24px; line-height:1.1;">RESIGNATION<br>APPROVAL REQUEST</div>
-                        </td>
-                        <td style="width:45%; vertical-align:top; border:none;">
-                            <div style="background:#FAF8F5; border:1px solid #D6C2A7; border-radius:10px; padding:10px; display:flex; gap:12px; align-items:center;">
-                                {img_html}
-                                <div>
-                                    <div style="font-size:10px; text-transform:uppercase; color:#8C5A2B; font-weight:800; letter-spacing:0.5px;">EMPLOYEE PROFILE</div>
-                                    <div style="font-size:16px; font-weight:800; color:#111; margin:3px 0;">{data['employee_name']}</div>
-                                    <div style="font-size:12px; color:#444;">{data['job_title']}</div>
-                                    <div style="font-size:11px; color:#666; margin-top:4px;">Resigning {r_date_header}</div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-
-                <div style="color:#000; font-weight:800; font-size:14px; margin-top:6px; margin-bottom:6px;">Resignation Journey</div>
-                
-                <div style="display:flex; gap:6px; text-align:center;">
-                    <div style="flex:1; border:1px solid #D6C2A7; border-radius:8px; padding:6px;"><div style="background:#8C5A2B; color:white; border-radius:50%; width:22px; height:22px; margin:auto; font-size:10px; display:flex; align-items:center; justify-content:center;">👤</div><div style="font-size:10px; font-weight:700; margin-top:2px;">Joined</div><div style="font-size:11px;">{h_date}</div></div>
-                    <div style="flex:1; border:1px solid #D6C2A7; border-radius:8px; padding:6px;"><div style="background:#8C5A2B; color:white; border-radius:50%; width:22px; height:22px; margin:auto; font-size:10px; display:flex; align-items:center; justify-content:center;">🏆</div><div style="font-size:10px; font-weight:700; margin-top:2px;">Total Experience</div><div style="font-size:11px;">{exp_days} Days</div></div>
-                    <div style="flex:1; border:1px solid #D6C2A7; border-radius:8px; padding:6px;"><div style="background:#8C5A2B; color:white; border-radius:50%; width:22px; height:22px; margin:auto; font-size:10px; display:flex; align-items:center; justify-content:center;">📄</div><div style="font-size:10px; font-weight:700; margin-top:2px;">Submitted</div><div style="font-size:11px;">{r_date}</div></div>
-                    <div style="flex:1; border:1px solid #D6C2A7; border-radius:8px; padding:6px;"><div style="background:#8C5A2B; color:white; border-radius:50%; width:22px; height:22px; margin:auto; font-size:10px; display:flex; align-items:center; justify-content:center;">🕒</div><div style="font-size:10px; font-weight:700; margin-top:2px;">Notice Period</div><div style="font-size:11px;">{data["notice_period"]}</div></div>
-                    <div style="flex:1; border:1px solid #D6C2A7; border-radius:8px; padding:6px;"><div style="background:#8C5A2B; color:white; border-radius:50%; width:22px; height:22px; margin:auto; font-size:10px; display:flex; align-items:center; justify-content:center;">✅</div><div style="font-size:10px; font-weight:700; margin-top:2px;">Finalized</div><div style="font-size:11px;">Approved {r_date}</div></div>
-                </div>
-
-                <div style="display:flex; gap:8px; margin-top:10px;">
-                    <div style="flex:1;"><div class="metric-badge">Total Net Pay (EGP)</div><div class="metric-box">{data["net_pay"]}</div></div>
-                    <div style="flex:1;"><div class="metric-badge">Last Working Day</div><div class="metric-box">{l_date}</div></div>
-                    <div style="flex:1;"><div class="metric-badge">Reason for Leaving</div><div class="metric-box">{data["reason"]}</div></div>
-                    <div style="flex:1;"><div class="metric-badge">Direct Manager</div><div class="metric-box">{data["direct_manager"]}</div></div>
-                </div>
-
-                <table class="custom-table">
-                    <thead>
-                        <tr><th style="width:40%;">Field</th><th style="width:60%;">Value</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Employee Name</td><td><b>{data['employee_name']}</b></td></tr>
-                        <tr><td>Branch</td><td>{data['branch']}</td></tr>
-                        <tr><td>Job Title</td><td>{data['job_title']}</td></tr>
-                        <tr><td>Hiring Date</td><td>{h_date}</td></tr>
-                        <tr><td>Resignation Date</td><td>{r_date}</td></tr>
-                        <tr><td>Last Working Day</td><td>{l_date}</td></tr>
-                        <tr><td>Grading System</td><td>{data['grading']}</td></tr>
-                        <tr><td>Total Net to pay EGP</td><td><b>{data['net_pay']}</b></td></tr>
-                        <tr><td>Reason for Leaving</td><td>{data['reason']}</td></tr>
-                        <tr><td>Notice Period Status</td><td>{data['notice_period']}</td></tr>
-                        <tr><td>Handover Status</td><td>{data['handover_status']}</td></tr>
-                        <tr><td>Total Experience</td><td>{exp_days} Day</td></tr>
-                        <tr><td>Direct Manager</td><td>{data['direct_manager']}</td></tr>
-                        <tr><td>Absence during the year</td><td>{data['absence_days']} Day</td></tr>
-                        <tr><td>Loan balance</td><td>{data['loan_balance']} EGP</td></tr>
-                    </tbody>
-                </table>
-
-                <div style="background:#FAF8F5; border:1px solid #D6C2A7; border-radius:8px; padding:10px; margin-top:10px;">
-                    <div style="color:#8C5A2B; font-weight:800; font-size:13px;">MANAGER ACTION ITEMS</div>
-                    <div style="color:#8C5A2B; font-weight:700; font-size:11px; margin-bottom:6px;">Resignation Next Steps</div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:11px;">
-                        <div>🧮 Calculate final dues payout ({data['net_pay']} EGP).</div>
-                        <div>🤝 Facilitate handover process with {data['handover_status']}.</div>
-                        <div>🕒 Review notice period waiver request ({data['notice_period']}).</div>
-                        <div>📦 Schedule property return (laptop, badge, keys).</div>
-                    </div>
-                </div>
-            </div>
-
-            <script>
-                function downloadAsImage() {{
-                    const element = document.getElementById("capture-card");
-                    html2canvas(element, {{ scale: 2 }}).then(canvas => {{
-                        const link = document.createElement("a");
-                        link.download = "Resignation_{data['employee_name']}.png";
-                        link.href = canvas.toDataURL("image/png");
-                        link.click();
-                    }});
-                }}
-            </script>
-        </body>
-        </html>
-        """
-        components.html(html_content, height=940, scrolling=True)
-
-        # EMAIL SECTION
-        with st.expander("✉️ إرسال التقرير عبر البريد الإلكتروني المباشر (Direct Corporate Send)", expanded=True):
-            c_e1, c_e2 = st.columns(2)
-            with c_e1:
-                receiver = st.text_input("بريد المستلم الرئيسي (To Email)", value="", placeholder="e.g. recipient@gmail.com", key="to_email_v2")
-                cc_receiver = st.text_input("نسخة كربونية (CC Email - اختياري)", value="", placeholder="e.g. manager@company.com", key="cc_email_v2")
-            with c_e2:
-                smtp_host = st.text_input("سيرفر SMTP", value="smtp.office365.com", key="smtp_v2")
-                st.info(f"📧 سيتم الإرسال تلقائياً من البريد المعتمد:\n`{DEFAULT_SENDER_EMAIL}`")
-
-            if st.button("🚀 إرسال التقرير الآن", key="send_btn_v2"):
-                if receiver and smtp_host:
+            if st.button("🚀 إرسال التقرير الآن"):
+                if to_email:
                     try:
                         msg = MIMEMultipart('alternative')
                         msg['Subject'] = f"Resignation Approval Request - {data['employee_name']}"
                         msg['From'] = DEFAULT_SENDER_EMAIL
-                        msg['To'] = receiver.strip()
+                        msg['To'] = to_email.strip()
                         
-                        recipients_list = [receiver.strip()]
-                        if cc_receiver.strip():
-                            msg['Cc'] = cc_receiver.strip()
-                            recipients_list.append(cc_receiver.strip())
-                        
+                        recipients = [to_email.strip()]
+                        if cc_email.strip():
+                            msg['Cc'] = cc_email.strip()
+                            recipients.append(cc_email.strip())
+
                         email_html = f"""
                         <html>
-                        <body style="font-family: Arial, sans-serif; background-color: #F8F6F0; padding: 20px;">
-                            <div style="background-color: #FAF8F5; border: 1px solid #D6C2A7; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto;">
-                                <h3 style="color: #8C5A2B;">Dear {recipient_title},</h3>
-                                <h2 style="color: #8C5A2B;">RESIGNATION APPROVAL REQUEST</h2>
-                                <hr style="border: 1px solid #EADBCE;">
+                        <body style="font-family: Arial, sans-serif; background:#F8F6F0; padding:20px;">
+                            <div style="background:#FAF8F5; border:1px solid #D6C2A7; padding:20px; border-radius:10px; max-width:600px; margin:auto;">
+                                <h3 style="color:#8C5A2B;">Dear {recipient_title},</h3>
+                                <h2 style="color:#8C5A2B;">RESIGNATION APPROVAL REQUEST</h2>
+                                <hr style="border:1px solid #EADBCE;">
                                 <p><b>Employee Name:</b> {data['employee_name']}</p>
                                 <p><b>Branch:</b> {data['branch']}</p>
                                 <p><b>Job Title:</b> {data['job_title']}</p>
-                                <p><b>Hiring Date:</b> {h_date}</p>
                                 <p><b>Last Working Day:</b> {l_date}</p>
-                                <p><b>Total Experience:</b> {exp_days} Days</p>
                                 <p><b>Total Net Pay:</b> {data['net_pay']} EGP</p>
-                                <p><b>Reason for Leaving:</b> {data['reason']}</p>
-                                <p><b>Direct Manager:</b> {data['direct_manager']}</p>
                             </div>
                         </body>
                         </html>
                         """
                         msg.attach(MIMEText(email_html, 'html'))
                         
-                        host_clean = smtp_host.strip()
-                        
-                        try:
-                            server = smtplib.SMTP(host_clean, 587, timeout=12)
-                            server.ehlo()
-                            server.starttls()
-                        except Exception:
-                            server = smtplib.SMTP_SSL(host_clean, 465, timeout=12)
-                            server.ehlo()
-
+                        server = smtplib.SMTP(smtp_server.strip(), 587, timeout=12)
+                        server.ehlo()
+                        server.starttls()
                         server.login(DEFAULT_SENDER_EMAIL, DEFAULT_SENDER_PASSWORD)
-                        server.sendmail(DEFAULT_SENDER_EMAIL, recipients_list, msg.as_string())
+                        server.sendmail(DEFAULT_SENDER_EMAIL, recipients, msg.as_string())
                         server.quit()
                         
-                        st.success("✅ تم إرسال الإيميل بنجاح!")
+                        st.success("✅ تم الإرسال بنجاح!")
                     except Exception as e:
-                        st.error(f"❌ فشل إرسال الإيميل: {e}")
+                        st.error(f"❌ فشل الإرسال: {e}")
                 else:
-                    st.error("يرجى إدخال بريد المستلم الرئيسي (To).")
+                    st.error("يرجى كتابة إيميل المستلم.")
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        with c_right:
+            # Render HTML Card Component & Canvas Print Scripts
+            if data.get('photo_b64'):
+                img_html = f'<img src="data:image/png;base64,{data["photo_b64"]}" style="width:100px; height:130px; border-radius:8px; object-fit:cover; border:1px solid #D6C2A7;" />'
+            else:
+                img_html = '<div style="width:100px; height:130px; background:#EADBCE; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:36px; border:1px solid #D6C2A7;">👤</div>'
+
+            html_content = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+                    body {{ font-family: 'Inter', sans-serif; background: transparent; margin: 0; padding: 0; }}
+                    .a4-card {{ background-color: #FAF8F5; border: 1.5px solid #D6C2A7; border-radius: 12px; padding: 22px; margin: 0 auto; }}
+                    .custom-table {{ width: 100%; border-collapse: collapse; margin-top: 10px; border: 1px solid #D6C2A7; }}
+                    .custom-table th {{ background-color: #8C5A2B; color: white; padding: 6px 10px; text-align: left; font-size: 12px; }}
+                    .custom-table td {{ padding: 5px 10px; border-bottom: 1px solid #EADBCE; font-size: 12px; color: #222; }}
+                    .custom-table tr:nth-child(even) {{ background-color: #FAF8F5; }}
+                    .metric-badge {{ background-color: #8C5A2B; color: white; border-radius: 12px; padding: 4px; text-align: center; font-size: 10px; font-weight:700; }}
+                    .metric-box {{ background-color: #FAF8F5; border: 1px solid #D6C2A7; border-radius: 6px; padding: 5px; text-align: center; font-weight: 800; font-size: 12px; }}
+                    .action-btn {{ background-color: #8C5A2B; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }}
+                </style>
+            </head>
+            <body>
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:10px;">
+                    <button onclick="downloadAsImage()" class="action-btn">🖼️ تنزيل صورة PNG</button>
+                    <button onclick="window.print()" class="action-btn">🖨️ طباعة A4</button>
+                </div>
+                <div id="capture-card" class="a4-card">
+                    <table style="width:100%; border:none;">
+                        <tr>
+                            <td style="width:60%; vertical-align:top; border:none;">
+                                <div style="color:#8C5A2B; font-size:15px; font-weight:700;">Dear {recipient_title},</div>
+                                <div style="color:#8C5A2B; font-weight:800; font-size:22px;">RESIGNATION<br>APPROVAL REQUEST</div>
+                            </td>
+                            <td style="width:40%; vertical-align:top; border:none;">
+                                <div style="display:flex; gap:10px; align-items:center;">
+                                    {img_html}
+                                    <div>
+                                        <div style="font-size:15px; font-weight:800; color:#111;">{data['employee_name']}</div>
+                                        <div style="font-size:12px; color:#555;">{data['job_title']}</div>
+                                        <div style="font-size:11px; color:#777;">{data['branch']}</div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div style="display:flex; gap:6px; margin-top:12px;">
+                        <div style="flex:1;"><div class="metric-badge">Net Pay</div><div class="metric-box">{data["net_pay"]} EGP</div></div>
+                        <div style="flex:1;"><div class="metric-badge">Last Work Day</div><div class="metric-box">{l_date}</div></div>
+                        <div style="flex:1;"><div class="metric-badge">Manager</div><div class="metric-box">{data["direct_manager"]}</div></div>
+                    </div>
+                    <table class="custom-table">
+                        <thead><tr><th>Field</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td>Employee Name</td><td><b>{data['employee_name']}</b></td></tr>
+                            <tr><td>Branch</td><td>{data['branch']}</td></tr>
+                            <tr><td>Hiring Date</td><td>{h_date}</td></tr>
+                            <tr><td>Resignation Date</td><td>{r_date}</td></tr>
+                            <tr><td>Last Working Day</td><td>{l_date}</td></tr>
+                            <tr><td>Total Experience</td><td>{exp_days} Days</td></tr>
+                            <tr><td>Reason for Leaving</td><td>{data['reason']}</td></tr>
+                            <tr><td>Handover Status</td><td>{data['handover_status']}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <script>
+                    function downloadAsImage() {{
+                        html2canvas(document.getElementById("capture-card"), {{ scale: 2 }}).then(canvas => {{
+                            const link = document.createElement("a");
+                            link.download = "Resignation_{data['employee_name']}.png";
+                            link.href = canvas.toDataURL("image/png");
+                            link.click();
+                        }});
+                    }}
+                </script>
+            </body>
+            </html>
+            """
+            components.html(html_content, height=650, scrolling=True)
 
 # ---------------------------------------------------------
-# TAB 2: EDIT & MANAGE RESIGNATIONS
+# TAB 2: DATA MANAGEMENT
 # ---------------------------------------------------------
 with tab_manage:
-    st.subheader("⚙️ إدارة تسجيلات الاستقالات")
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.subheader("⚙️ إدارة واستحداث بيانات الاستقالة")
+    
+    action = st.radio("نوع العملية:", ["إضافة استقالة جديدة ➕", "تعديل الاستقالة الحالية ✏️", "حذف استقالة 🗑️"], horizontal=True)
 
-    action_type = st.radio("اختر نوع الإجراء المطلوب:", ["إضافة استقالة جديدة ➕", "تعديل بيانات استقالة ✏️", "حذف استقالة 🗑️"], horizontal=True)
-
-    if action_type == "حذف استقالة 🗑️":
-        if not st.session_state.resignations_db:
-            st.warning("لا توجد استقالات مسجلة لحذفها.")
-        else:
-            del_options = {r['id']: f"{r['employee_name']} — ({r['branch']})" for r in st.session_state.resignations_db}
-            del_id = st.selectbox("اختر الاستقالة المراد حذفها نهائياً:", options=list(del_options.keys()), format_func=lambda x: del_options[x])
-            
-            if st.button("❌ تأكيد الحذف النهائي", type="primary"):
-                st.session_state.resignations_db = [r for r in st.session_state.resignations_db if r['id'] != del_id]
-                st.success("✅ تم حذف الاستقالة بنجاح!")
+    if action == "حذف استقالة 🗑️":
+        if st.session_state.resignations_db:
+            if st.button("❌ تأكيد الحذف النهائي"):
+                st.session_state.resignations_db = [r for r in st.session_state.resignations_db if r['id'] != selected_id]
+                st.success("تم الحذف بنجاح!")
                 st.rerun()
-
     else:
-        if action_type == "تعديل بيانات استقالة ✏️" and st.session_state.resignations_db:
-            edit_options = {r['id']: f"{r['employee_name']} — ({r['branch']})" for r in st.session_state.resignations_db}
-            edit_id = st.selectbox("اختر الموظف المراد تعديل بياناته:", options=list(edit_options.keys()), format_func=lambda x: edit_options[x])
-            target_data = next(item for item in st.session_state.resignations_db if item["id"] == edit_id)
-        else:
-            target_data = {
-                "id": None,
-                "recipient_name": "",
-                "employee_name": "",
-                "job_title": "",
-                "branch": "",
-                "grading": "",
-                "hiring_date": date.today(),
-                "resignation_date": date.today(),
-                "last_working_day": date.today(),
-                "net_pay": 0,
-                "reason": "",
-                "direct_manager": "",
-                "notice_period": "",
-                "handover_status": "",
-                "absence_days": 0,
-                "loan_balance": 0,
-                "photo_b64": None
-            }
+        target = data if (action == "تعديل الاستقالة الحالية ✏️" and data) else {
+            "id": None, "recipient_name": "", "employee_name": "", "job_title": "",
+            "branch": "", "grading": "", "hiring_date": date.today(),
+            "resignation_date": date.today(), "last_working_day": date.today(),
+            "net_pay": 0, "reason": "", "direct_manager": "", "notice_period": "",
+            "handover_status": "", "absence_days": 0, "loan_balance": 0, "photo_b64": None
+        }
 
-        with st.form("resignation_form"):
-            st.markdown("##### 📩 بيانات الموجه إليه الطلب والمدير المباشر")
-            col_rec1, col_rec2 = st.columns(2)
-            with col_rec1:
-                recipient_input = to_english_str(st.text_input("اسم المرسل إليه / الموجه له الطلب (Recipient Name)", value=target_data.get('recipient_name', '')))
-            with col_rec2:
-                direct_manager = to_english_str(st.text_input("المدير المباشر (Direct Manager)", value=target_data['direct_manager']))
-
-            st.markdown("---")
-            st.markdown("##### 👤 بيانات الموظف والوظيفة")
-            col1, col2 = st.columns(2)
+        with st.form("manage_form"):
+            c1, c2 = st.columns(2)
+            with c1:
+                e_name = to_english_str(st.text_input("اسم الموظف:", value=target['employee_name']))
+                j_title = to_english_str(st.text_input("المسمى الوظيفي:", value=target['job_title']))
+                br = to_english_str(st.text_input("الفرع:", value=target['branch']))
+                rec_name = to_english_str(st.text_input("الموجه له الطلب (Recipient):", value=target.get('recipient_name', '')))
+                mgr = to_english_str(st.text_input("المدير المباشر:", value=target['direct_manager']))
+            with c2:
+                h_dt = st.date_input("تاريخ التعيين:", value=target['hiring_date'])
+                r_dt = st.date_input("تاريخ الاستقالة:", value=target['resignation_date'])
+                l_dt = st.date_input("آخر يوم عمل:", value=target['last_working_day'])
+                pay = st.number_input("إجمالي المستحقات (EGP):", value=int(target['net_pay']))
+                rsn = to_english_str(st.text_input("سبب الاستقالة:", value=target['reason']))
+                
+            photo = st.file_uploader("الصورة الشخصية (4x6):", type=["png", "jpg"])
             
-            with col1:
-                emp_name = to_english_str(st.text_input("اسم الموظف (Employee Name)", value=target_data['employee_name']))
-                job_title = to_english_str(st.text_input("المسمى الوظيفي (Job Title)", value=target_data['job_title']))
-                branch = to_english_str(st.text_input("اسم الفرع (Branch)", value=target_data['branch']))
-                grading = to_english_str(st.text_input("الدرجة الوظيفية (Grading System)", value=target_data['grading']))
-                reason = to_english_str(st.text_input("سبب الاستقالة (Reason for Leaving)", value=target_data['reason']))
-                
-            with col2:
-                hiring_date = st.date_input("تاريخ التعيين (Hiring Date)", value=target_data['hiring_date'])
-                resignation_date = st.date_input("تاريخ تقديم الاستقالة (Resignation Date)", value=target_data['resignation_date'])
-                last_working_day = st.date_input("آخر يوم عمل (Last Working Day)", value=target_data['last_working_day'])
-                
-                calc_exp = (last_working_day - hiring_date).days
-                if calc_exp < 0:
-                    calc_exp = 0
-                st.info(f"🏆 إجمالي الخبرة (Total Experience): **{calc_exp} Days** (تحسب تلقائياً من تاريخ التعيين وآخر يوم عمل)")
-                
-                net_pay = st.number_input("إجمالي المستحقات (Total Net Pay EGP)", value=int(target_data['net_pay']), step=500)
-                notice_period = to_english_str(st.text_input("فترة الإشعار (Notice Period Status)", value=target_data['notice_period']))
-                handover_status = to_english_str(st.text_input("حالة التسليم (Handover Status)", value=target_data['handover_status']))
-
-            col3, col4 = st.columns(2)
-            with col3:
-                absence_days = st.number_input("أيام الغياب (Absence Days)", value=int(target_data['absence_days']))
-                loan_balance = st.number_input("رصيد السلفة (Loan Balance EGP)", value=int(target_data['loan_balance']))
-            with col4:
-                uploaded_photo = st.file_uploader("🖼️ رفع صورة شخصية للموظف (Upload Photo 4x6)", type=["png", "jpg", "jpeg"])
-
-            save_btn = st.form_submit_button("💾 حفظ البيانات والتحديث", type="primary")
-
-            if save_btn:
-                if uploaded_photo is not None:
-                    photo_b64 = base64.b64encode(uploaded_photo.getvalue()).decode()
-                else:
-                    photo_b64 = target_data.get('photo_b64')
-
-                new_id = target_data['id'] if target_data['id'] else (max([r['id'] for r in st.session_state.resignations_db], default=0) + 1)
-                
-                updated_record = {
-                    "id": new_id,
-                    "recipient_name": recipient_input,
-                    "employee_name": emp_name if emp_name else "Unnamed Employee",
-                    "job_title": job_title,
-                    "branch": branch,
-                    "grading": grading,
-                    "hiring_date": hiring_date,
-                    "resignation_date": resignation_date,
-                    "last_working_day": last_working_day,
-                    "net_pay": net_pay,
-                    "reason": reason,
-                    "direct_manager": direct_manager,
-                    "notice_period": notice_period,
-                    "handover_status": handover_status,
-                    "absence_days": absence_days,
-                    "loan_balance": loan_balance,
-                    "photo_b64": photo_b64
+            if st.form_submit_button("💾 حفظ وحفظ التعديلات"):
+                p_b64 = base64.b64encode(photo.getvalue()).decode() if photo else target.get('photo_b64')
+                new_rec = {
+                    "id": target['id'] if target['id'] else len(st.session_state.resignations_db) + 1,
+                    "recipient_name": rec_name, "employee_name": e_name, "job_title": j_title,
+                    "branch": br, "grading": "G1", "hiring_date": h_dt, "resignation_date": r_dt,
+                    "last_working_day": l_dt, "net_pay": pay, "reason": rsn, "direct_manager": mgr,
+                    "notice_period": "One Month", "handover_status": "Completed",
+                    "absence_days": 0, "loan_balance": 0, "photo_b64": p_b64
                 }
-
-                if action_type == "تعديل بيانات استقالة ✏️" and target_data['id']:
-                    idx = next(i for i, item in enumerate(st.session_state.resignations_db) if item["id"] == target_data['id'])
-                    st.session_state.resignations_db[idx] = updated_record
-                    st.success("✅ تم حفظ التعديلات بنجاح!")
+                if action == "تعديل الاستقالة الحالية ✏️" and target['id']:
+                    idx = next(i for i, item in enumerate(st.session_state.resignations_db) if item["id"] == target['id'])
+                    st.session_state.resignations_db[idx] = new_rec
                 else:
-                    st.session_state.resignations_db.insert(0, updated_record)
-                    st.success("✅ تم تسجيل الاستقالة بنجاح!")
-                
+                    st.session_state.resignations_db.insert(0, new_rec)
+                st.success("تم الحفظ بنجاح!")
                 st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# TAB 3: DASHBOARD
+# TAB 3: DASHBOARD ANALYTICS
 # ---------------------------------------------------------
-with tab_dashboard:
-    st.title("📊 داشبورد تحليل استقالات الفروع")
-
-    if not st.session_state.resignations_db:
-        st.info("لا توجد استقالات مسجلة.")
-    else:
-        records = []
-        for r in st.session_state.resignations_db:
-            exp = (r['last_working_day'] - r['hiring_date']).days
-            if exp < 0:
-                exp = 0
-            records.append({
-                "المرسل إليه": r.get('recipient_name', ''),
-                "اسم الموظف": r['employee_name'],
-                "الفرع": r['branch'],
-                "المسمى الوظيفي": r['job_title'],
-                "تاريخ التعيين": r['hiring_date'].strftime("%Y-%m-%d"),
-                "آخر يوم عمل": r['last_working_day'].strftime("%Y-%m-%d"),
-                "إجمالي الخبرة (يوم)": exp,
-                "إجمالي المستحقات (EGP)": r['net_pay'],
-                "سبب الاستقالة": r['reason'],
-                "المدير المباشر": r['direct_manager']
-            })
-        
-        df = pd.DataFrame(records)
-
-        m1, m2, m3, m4 = st.columns(4)
+with tab_analytics:
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.subheader("📊 الداشبورد والتحليلات الإحصائية")
+    if st.session_state.resignations_db:
+        df = pd.DataFrame(st.session_state.resignations_db)
+        m1, m2, m3 = st.columns(3)
         m1.metric("إجمالي الاستقالات", len(df))
-        m2.metric("عدد الفروع", df['الفرع'].nunique())
-        m3.metric("إجمالي المستحقات (EGP)", f"{df['إجمالي المستحقات (EGP)'].sum():,}")
-        m4.metric("متوسط الخبرة (يوم)", f"{int(df['إجمالي الخبرة (يوم)'].mean())} يوم")
-
+        m2.metric("عدد الفروع", df['branch'].nunique())
+        m3.metric("إجمالي المستحقات", f"{df['net_pay'].sum():,} EGP")
         st.markdown("---")
-
-        c1, c2 = st.columns([1, 1])
-        with c1:
-            st.subheader("🏢 توزيع الاستقالات حسب الفرع")
-            b_df = df['الفرع'].value_counts().reset_index()
-            b_df.columns = ['اسم الفرع', 'عدد الاستقالات']
-            st.dataframe(b_df, use_container_width=True)
-            st.bar_chart(data=b_df.set_index('اسم الفرع'))
-
-        with c2:
-            st.subheader("💡 الأسباب الأكثر شيوعاً")
-            r_df = df['سبب الاستقالة'].value_counts().reset_index()
-            r_df.columns = ['السبب', 'العدد']
-            st.dataframe(r_df, use_container_width=True)
-
-        st.markdown("---")
-        st.subheader("🔍 البحث والتصدير")
-        q = st.text_input("ابحث باسم الموظف أو الفرع:").strip()
-        filtered = df[df['اسم الموظف'].str.contains(q, case=False, na=False) | df['الفرع'].str.contains(q, case=False, na=False)] if q else df
-        st.dataframe(filtered, use_container_width=True)
-
-        csv = filtered.to_csv(index=False).encode('utf-8')
-        st.download_button("📥 تصدير سجل الاستقالات كملف CSV", data=csv, file_name="resignations_master_log.csv", mime="text/csv")
+        st.bar_chart(df['branch'].value_counts())
+    st.markdown('</div>', unsafe_allow_html=True)

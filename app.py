@@ -10,7 +10,7 @@ from email.mime.text import MIMEText
 from docx import Document
 
 # ---------------------------------------------------------
-# 1. Page Configuration & Styling Setup
+# Page Configuration
 # ---------------------------------------------------------
 st.set_page_config(
     page_title="Resignation Approval System",
@@ -18,6 +18,9 @@ st.set_page_config(
     layout="wide"
 )
 
+# ---------------------------------------------------------
+# Custom CSS for Top Navigation Tabs
+# ---------------------------------------------------------
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
@@ -30,7 +33,7 @@ st.markdown("""
         background-color: #F8F6F0;
     }
 
-    /* Rectangular Glowing Top Navigation Tabs */
+    /* Glowing Rectangular Top Navigation Tabs */
     .stTabs [data-baseweb="tab-list"] {
         gap: 12px;
         background-color: transparent;
@@ -67,9 +70,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# 2. Helper & Export Functions
-# ---------------------------------------------------------
+# Helper Function
 def to_english_str(text):
     if not text:
         return ""
@@ -78,6 +79,7 @@ def to_english_str(text):
     trans = str.maketrans(arabic_num, english_num)
     return str(text).translate(trans)
 
+# Helper for Word (.docx)
 def generate_word_doc(data, exp_days):
     doc = Document()
     doc.add_heading(f"RESIGNATION APPROVAL REQUEST - {data['employee_name']}", 0)
@@ -100,6 +102,7 @@ def generate_word_doc(data, exp_days):
     doc.save(bio)
     return bio.getvalue()
 
+# Helper for Excel (.xlsx)
 def generate_excel(data, exp_days):
     df_single = pd.DataFrame([{
         "Recipient Name": data.get('recipient_name', ''),
@@ -124,7 +127,7 @@ def generate_excel(data, exp_days):
         df_single.to_excel(writer, index=False, sheet_name='Resignation')
     return output.getvalue()
 
-# Initialize Session Database
+# Database Initialization
 if 'resignations_db' not in st.session_state:
     st.session_state.resignations_db = [
         {
@@ -149,7 +152,7 @@ if 'resignations_db' not in st.session_state:
     ]
 
 # ---------------------------------------------------------
-# 3. Main Interface & Navigation Layout
+# Top Navigation Bar
 # ---------------------------------------------------------
 tab_main, tab_manage, tab_dashboard = st.tabs([
     "🏠 عرض وطباعة الاستقالة (A4)", 
@@ -404,23 +407,23 @@ with tab_main:
         """
         components.html(html_content, height=940, scrolling=True)
 
-        # Email Section
-        with st.expander("📧 إرسال التقرير عبر البريد الإلكتروني (Send via Email)"):
+        # EMAIL TEMPLATE SECTION - OPTIMIZED FOR COMPANY EMAILS (OUTLOOK/GMAIL)
+        with st.expander("📧 إرسال التقرير عبر البريد الإلكتروني (Send via Corporate Email)"):
             c_e1, c_e2 = st.columns(2)
             with c_e1:
-                sender = st.text_input("بريد المرسل (Sender Email)")
-                pwd = st.text_input("كلمة مرور التطبيق (App Password)", type="password")
+                sender = st.text_input("بريد المرسل (Sender Email)", value="")
+                pwd = st.text_input("كلمة المرور / App Password", type="password", value="")
             with c_e2:
-                receiver = st.text_input("بريد المستلم (Receiver Email)")
-                smtp_host = st.text_input("سيرفر SMTP", value="smtp.gmail.com")
+                receiver = st.text_input("بريد المستلم (Receiver Email)", value="")
+                smtp_host = st.text_input("سيرفر SMTP الخاص بالشركة", value="smtp.office365.com", help="استخدم smtp.office365.com لإيميلات أوتلوك الشركات أو smtp.gmail.com لـ Gmail")
 
             if st.button("🚀 إرسال التقرير مباشرة بالإيميل"):
-                if sender and pwd and receiver:
+                if sender and pwd and receiver and smtp_host:
                     try:
                         msg = MIMEMultipart('alternative')
                         msg['Subject'] = f"Resignation Approval Request - {data['employee_name']}"
-                        msg['From'] = sender
-                        msg['To'] = receiver
+                        msg['From'] = sender.strip()
+                        msg['To'] = receiver.strip()
                         
                         email_html = f"""
                         <html>
@@ -443,16 +446,27 @@ with tab_main:
                         </html>
                         """
                         msg.attach(MIMEText(email_html, 'html'))
-                        server = smtplib.SMTP(smtp_host, 587)
-                        server.starttls()
-                        server.login(sender, pwd)
-                        server.sendmail(sender, receiver, msg.as_string())
+                        
+                        host_clean = smtp_host.strip()
+                        
+                        # Auto-detect and try TLS (Port 587) first, then SSL (Port 465)
+                        try:
+                            server = smtplib.SMTP(host_clean, 587, timeout=12)
+                            server.ehlo()
+                            server.starttls()
+                        except Exception:
+                            server = smtplib.SMTP_SSL(host_clean, 465, timeout=12)
+                            server.ehlo()
+
+                        server.login(sender.strip(), pwd.strip())
+                        server.sendmail(sender.strip(), receiver.strip(), msg.as_string())
                         server.quit()
+                        
                         st.success("✅ تم إرسال الإيميل بنجاح!")
                     except Exception as e:
                         st.error(f"❌ فشل إرسال الإيميل: {e}")
                 else:
-                    st.error("يرجى ملء جميع بيانات الإيميل وتحقيق الصيغة الصحيحة (مثل name@domain.com).")
+                    st.error("يرجى ملء جميع الحقول بصيغة إيميل صحيحة (e.g. user@company.com).")
 
 # ---------------------------------------------------------
 # TAB 2: EDIT & MANAGE RESIGNATIONS
